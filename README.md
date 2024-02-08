@@ -15,13 +15,13 @@ To build and deploy the web application locally, follow these steps:
 1. Clone the repository to your local machine:
 
    ```
-   git clone <repository-url>
+   git clone https://github.com/csye-6225-nitesh-cloud-org/webapp.git
    ```
 
 2. Navigate to the project directory:
 
    ```
-   cd MyWebApp
+   cd webapp
    ```
 
 3. Install dependencies:
@@ -41,7 +41,7 @@ To build and deploy the web application locally, follow these steps:
    PORT=8080
    DB_USER=your_db_user
    DB_NAME=your-db-name
-   PORT=PORT_NUMBER
+   PORT=8080
    HOSTNAME=localhost
    ```
 
@@ -55,4 +55,3 @@ To build and deploy the web application locally, follow these steps:
 
 6. Open your web browser and navigate to `http://localhost:8080` to access the web application.
  
- ### testing workflow
