@@ -2,7 +2,6 @@ const db = require("./models");
 const app = require("./app");
 const config = require("./config/config.js");
 
-
 const PORT = config.PORT;
 const HOSTNAME = config.HOSTNAME;
 
