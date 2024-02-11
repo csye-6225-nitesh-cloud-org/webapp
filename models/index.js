@@ -7,7 +7,7 @@ const sequelize = new Sequelize (dbConfig.DB_NAME, dbConfig.DB_USER, dbConfig.DB
     host: dbConfig.DB_HOST,
     port: dbConfig.DB_PORT,
     dialect: dbConfig.dialect,
-    operatorsAliases: false,
+    operatorsAliases: 0,
 });
 
 const db = {};

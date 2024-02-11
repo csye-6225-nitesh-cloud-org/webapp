@@ -8,4 +8,5 @@ module.exports = {
     DB_PORT: process.env.DB_PORT || 5432,
     PORT: process.env.PORT,
     HOSTNAME:  process.env.HOSTNAME,
+    NODE_ENV: process.env.NODE_ENV
 }
