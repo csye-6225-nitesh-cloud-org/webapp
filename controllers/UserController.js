@@ -103,16 +103,20 @@ const editUserData = async (req, res) => {
         });
     }
 
-    if (password && typeof password !== 'string') {
-        return res.status(400).json({
-            message: "Password must be a string."
-        });
+    if (password !== undefined) {
+        if( typeof password !== 'string' || password.trim() === "") {
+            return res.status(400).json({
+                message: "Password must be a non empty string."
+            });
+        }
+        if (password.length <= 5) {
+            return res.status(400).json({
+                message: "Minimum Password Length is 6 char"
+            });
+        }
+
     }
-    if (password && password.length <= 5) {
-        return res.status(400).json({
-            message: "Minimum Password Length is 6 char"
-        });
-    }
+
     try {
         const existingUser = await User.findOne({
             where: {
