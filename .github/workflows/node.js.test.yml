@@ -9,28 +9,26 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-         - 5432:5432
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
-    - run: npm i
-    - run: |
+    - name: Intsall PostgreSQL
+      run: |
+        sudo apt update
+        sudo apt install -y postgresql postgresql-contrib
+        sudo systemctl start postgresql    
+
+    - name: Configure PostgreSQL
+      run: |
+        sudo -u postgres psql -c "CREATE DATABASE ${{secrets.DB_NAME}};"
+        sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+
+    - name: Configure Environment Variables
+      run: |
         echo > .env
         ls -al | grep .env
         echo NODE_ENV=${{ secrets.ENVIRONMENT }} >> .env
@@ -41,5 +39,9 @@ jobs:
         echo DB_PORT=${{ secrets.DB_PORT }} >> .env
         echo PORT=${{ secrets.PORT }} >> .env
         echo HOSTNAME=${{ secrets.HOSTNAME }} >> .env
-      name: " Run Tests"
-    - run: npm test
+    
+    - name: Install Dependencies and Run Tests
+      run: npm i
+
+    - name: " Run Tests"
+      run: npm test
