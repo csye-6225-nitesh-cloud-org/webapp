@@ -26,6 +26,7 @@ jobs:
       - name: Pkrvars configuration
         run: |
           echo > gcp.pkrvars.hcl
+          ls al | grep gcp.pkrvars.hcl
           echo environment=\"${{ secrets.NODE_ENV }}\" >> gcp.pkrvars.hcl
           echo project_name=\"${{ secrets.PROJECT_NAME }}\" >> gcp.pkrvars.hcl
           echo source_image_family=\"${{ secrets.SOURCE_IMAGE_FAMILY }}\" >> gcp.pkrvars.hcl
@@ -37,7 +38,6 @@ jobs:
           echo DB_PASSWORD=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
           echo DB_USER=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
           echo DB_NAME=\"${{ secrets.DB_NAME}}\" >> gcp.pkrvars.hcl
-          ls al | grep gcp.pkrvars.hcl
           cat gcp.pkrvars.hcl
 
       - name: Packer init
