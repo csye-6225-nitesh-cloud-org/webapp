@@ -26,7 +26,7 @@ jobs:
       - name: Pkrvars configuration
         run: |
           echo > gcp.pkrvars.hcl
-          ls al
+          ls -al
           echo environment=\"${{ secrets.NODE_ENV }}\" >> gcp.pkrvars.hcl
           echo project_name=\"${{ secrets.PROJECT_NAME }}\" >> gcp.pkrvars.hcl
           echo source_image_family=\"${{ secrets.SOURCE_IMAGE_FAMILY }}\" >> gcp.pkrvars.hcl
