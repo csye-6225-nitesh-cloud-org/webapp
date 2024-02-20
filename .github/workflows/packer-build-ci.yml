@@ -1,0 +1,95 @@
+name: Packer Build CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  packer-build:
+    name: Packer Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Intsall PostgreSQL
+        run: |
+          sudo apt update
+          sudo apt install -y postgresql postgresql-contrib
+          sudo systemctl start postgresql    
+
+      - name: Configure PostgreSQL
+        run: |
+          sudo -u postgres psql -c "CREATE DATABASE ${{secrets.DB_NAME}};"
+          sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+
+      - name: Configure Environment Variables
+        run: |
+          echo > .env
+          echo NODE_ENV=${{ secrets.NODE_ENV }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_USER=${{ secrets.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          echo HOSTNAME=${{ secrets.HOSTNAME }} >> .env
+
+      - name: Zip webapp
+        run: |
+          zip -r webapp.zip ./
+          ls  -al
+
+      - name: Run Test
+        run: |
+          npm i
+          npm test
+
+      - name: Install and Configure gcloud CLI
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          export_default_credentials: true
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: 'latest'
+
+      - name: Pkrvars configuration
+        run: |
+          echo > gcp.pkrvars.hcl
+          ls -al
+          echo environment=\"${{ secrets.NODE_ENV }}\" >> gcp.pkrvars.hcl
+          echo project_name=\"${{ secrets.PROJECT_NAME }}\" >> gcp.pkrvars.hcl
+          echo source_image_family=\"${{ secrets.SOURCE_IMAGE_FAMILY }}\" >> gcp.pkrvars.hcl
+          echo ssh_username=\"${{ secrets.SSH_USERNAME }}\" >> gcp.pkrvars.hcl
+          echo zone=\"${{ secrets.ZONE }}\" >> gcp.pkrvars.hcl
+          echo machineType=\"${{ secrets.MACHINETYPE }}\" >> gcp.pkrvars.hcl
+          echo diskType=\"${{ secrets.DISKTYPE }}\" >> gcp.pkrvars.hcl
+          echo diskSize=${{ secrets.DISKSIZE }} >> gcp.pkrvars.hcl
+          echo DB_PASSWORD=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
+          echo DB_USER=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
+          echo DB_NAME=\"${{ secrets.DB_NAME}}\" >> gcp.pkrvars.hcl
+
+      - name: Packer Format
+        run: packer fmt .
+        id: format
+
+      - name: Packer Init
+        run: "packer init ./gcp.pkr.hcl"
+
+      - name: Packer Validate
+        id: validate
+        run: "packer validate --var-file=gcp.pkrvars.hcl ./gcp.pkr.hcl"
+
+      - name: Packer build
+        id: build
+        run: "packer build  --var-file=gcp.pkrvars.hcl ./gcp.pkr.hcl"
