@@ -1,132 +1,90 @@
-logs
+# Log files
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
-*.idea
-
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+# IDE - JetBrains
+*.idea
 
-pids
+# Process IDs
 *.pid
 *.seed
 *.pid.lock
 
-
+# Coverage directories
 lib-cov
-
-
 coverage
 *.lcov
-
-
 .nyc_output
 
-
+# Build tools
 .grunt
-
-
-bower_components
-
-
 .lock-wscript
-
-
 build/Release
 
-
+# Dependency directories
 node_modules/
 jspm_packages/
-
-
+bower_components/
 web_modules/
 
-
+# TypeScript build artifacts
 *.tsbuildinfo
 
-
+# Package manager lock files and caches
+.yarn-integrity
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 .npm
-
-
 .eslintcache
-
-
 .stylelintcache
 
-
+# Cache directories for tools and frameworks
 .rpt2_cache/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
+.cache
+.parcel-cache
+.next
+out
+.nuxt
+dist
+.cache/
+.vuepress/dist
+.temp
+.docusaurus
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+
+# Packer specific - Exclude all packer variable files
+*.auto.pkrvars.hcl
+*.pkrvars*
 
 
-.node_repl_history
-
-
-*.tgz
-
-
-.yarn-integrity
-
-
+# Sensitive environment files
 .env
 .env.development.local
 .env.test.local
 .env.production.local
 .env.local
 
-
-.cache
-.parcel-cache
-
-
-.next
-out
-
-
-.nuxt
-dist
-
-
-.cache/
-
-
-.vuepress/dist
-
-
-.temp
-.cache
-
-
-.docusaurus
-
-
-.serverless/
-
-
-.fusebox/
-
-
-.dynamodb/
-
-
-.tern-port
-
-
-.vscode-test
-
-
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-
+# Archives and compression
+*.tgz
 *.zip
 *.tar.gz
 *.tar
 manifest*
+
+# Other directories and files to ignore
+.node_repl_history
