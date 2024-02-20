@@ -37,7 +37,8 @@ jobs:
           echo DB_PASSWORD=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
           echo DB_USER=\"${{ env.DB_USER }}\" >> gcp.pkrvars.hcl
           echo DB_NAME=\"${{ secrets.DB_NAME}}\" >> gcp.pkrvars.hcl
-
+          ls al | grep gcp.pkrvars.hcl
+          cat gcp.pkrvars.hcl
 
       - name: Packer init
         run: "packer init ./gcp.pkr.hcl"
