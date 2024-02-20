@@ -14,7 +14,7 @@ cd /home/csye6225/
 
 # Unzip the application files
 echo "Unzipping the application files"
-sudo unzip webapp.zip -d .
+sudo unzip webapp.zip -d /home/csye6225/webapp
 
 echo "Changing Permissions"
 sudo chown -R csye6225:csye6225 /home/csye6225/webapp
