@@ -39,9 +39,13 @@ jobs:
           echo DB_USER=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
           echo DB_NAME=\"${{ secrets.DB_NAME}}\" >> gcp.pkrvars.hcl
 
-      - name: Packer init
+      - name: Packer Format Check
+        run: packer fmt -check -diff ./gcp.pkr.hcl
+        id: format
+
+      - name: Packer Init
         run: "packer init ./gcp.pkr.hcl"
 
-      - name: Step 5 - Run `packer validate`
+      - name: Packer Validate
         id: validate
         run: "packer validate --var-file=gcp.pkrvars.hcl ./gcp.pkr.hcl"
