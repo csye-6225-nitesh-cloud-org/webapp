@@ -1,0 +1,47 @@
+name: Packer CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  Packer-validate:
+    name: Validate Packer Template
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Zip webapp
+        run: |
+          zip -r webapp.zip ./
+          ls  -al
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: 'latest'
+
+      - name: Pkrvars configuration
+        run: |
+          echo > gcp.pkrvars.hcl
+          echo environment=\"${{ secrets.NODE_ENV }}\" >> gcp.pkrvars.hcl
+          echo project_name="${{ secrets.PROJECT_NAME }}\" >> gcp.pkrvars.hcl
+          echo source_image_family=\"${{ secrets.SOURCE_IMAGE_FAMILY }}\" >> gcp.pkrvars.hcl
+          echo ssh_username=\"${{ secrets.SSH_USERNAME }}\" >> gcp.pkrvars.hcl
+          echo zone=\"${{ secrets.ZONE }}\" >> gcp.pkrvars.hcl
+          echo machineType=\"${{ secrets.MACHINETYPE }}\" >> gcp.pkrvars.hcl
+          echo diskType=\"${{ secrets.DISKTYPE }}\" >> gcp.pkrvars.hcl
+          echo diskSize=${{ secrets.DISKSIZE }} >> gcp.pkrvars.hcl
+          echo DB_PASSWORD=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
+          echo DB_USER=\"${{ env.DB_USER }}\" >> gcp.pkrvars.hcl
+          echo DB_NAME=\"${{ secrets.DB_NAME}}\" >> gcp.pkrvars.hcl
+
+
+      - name: Packer init
+        run: "packer init ./gcp.pkr.hcl"
+
+      - name: Step 5 - Run `packer validate`
+        id: validate
+        run: "packer validate --var-file=gcp.pkrvars.hcl ./gcp.pkr.hcl"
