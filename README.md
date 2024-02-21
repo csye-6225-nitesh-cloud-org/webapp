@@ -55,3 +55,17 @@ To build and deploy the web application locally, follow these steps:
 
 6. Open your web browser and navigate to `http://localhost:8080` to access the web application.
  
+## Useful Packer commands
+```shell
+packer init    
+```
+```shell
+packer validate --var-file=gcp.pkrvars.hcl gcp.pkr.hcl 
+```
+```shell
+packer validate --var-file=gcp.pkrvars.hcl gcp.pkr.hcl 
+```
+```shell
+packer build --var-file=gcp.pkrvars.hcl gcp.pkr.hcl   
+```
+

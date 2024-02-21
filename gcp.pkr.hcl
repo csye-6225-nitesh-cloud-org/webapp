@@ -56,10 +56,19 @@ variable "DB_NAME" {
   type = string
 
 }
+variable "image_family_name" {
+  type = string
+}
+
+variable "image_name" {
+  type = string
+}
 
 source "googlecompute" "centos" {
   project_id          = var.project_name
   source_image_family = var.source_image_family
+  image_name          = "${var.image_name}-{{timestamp}}"
+  image_family        = "${var.environment}-${var.image_family_name}"
   zone                = var.zone
   ssh_username        = var.ssh_username
   machine_type        = var.machineType

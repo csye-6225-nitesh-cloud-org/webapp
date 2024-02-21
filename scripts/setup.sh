@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Update the system
-echo "Updating the system"
-sudo dnf update -y
+#echo "Updating the system"
+#sudo dnf update -y
 
 # Install Node.js
 echo "Installing Node.js"
