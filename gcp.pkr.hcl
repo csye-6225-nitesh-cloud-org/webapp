@@ -78,7 +78,7 @@ source "googlecompute" "centos" {
 
 }
 build {
- 
+  sources = ["source.googlecompute.centos"]
 
   provisioner "file" {
     source      = "./webapp.zip"
