@@ -44,18 +44,7 @@ variable "diskSize" {
   type = number
 
 }
-variable "DB_PASSWORD" {
-  type = string
 
-}
-variable "DB_USER" {
-  type = string
-
-}
-variable "DB_NAME" {
-  type = string
-
-}
 variable "image_family_name" {
   type = string
 }
@@ -91,11 +80,6 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "DB_PASSWORD=${var.DB_PASSWORD}",
-      "DB_USER=${var.DB_USER}",
-      "DB_NAME=${var.DB_NAME}"
-    ]
     scripts = [
       "scripts/create-user.sh",
       "scripts/setup.sh",

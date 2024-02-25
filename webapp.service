@@ -1,6 +1,8 @@
 [Unit]
 Description=Node.js Application Service
+ConditionPathExists=/home/csye6225/webapp/.env
 After=network.target
+After=google-startup-scripts.service
 
 [Service]
 Type=simple

@@ -17,7 +17,4 @@ sudo setenforce 0
 
 sudo systemctl enable webapp.service
 
-sudo systemctl start webapp.service
-echo "Status."
-sudo systemctl status webapp.service
 echo "Systemd service is set up and enabled."

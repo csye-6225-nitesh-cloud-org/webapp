@@ -30,6 +30,11 @@ jobs:
           sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
           sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
 
+      - name: Zip Artifact
+        run: |
+          zip -r webapp.zip ./
+          ls  -al
+
       - name: Configure Environment Variables
         run: |
           echo > .env
@@ -41,11 +46,6 @@ jobs:
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
           echo PORT=${{ secrets.PORT }} >> .env
           echo HOSTNAME=${{ secrets.HOSTNAME }} >> .env
-
-      - name: Zip webapp
-        run: |
-          zip -r webapp.zip ./
-          ls  -al
 
       - name: Run Test
         run: |
@@ -75,9 +75,6 @@ jobs:
           echo machineType=\"${{ secrets.MACHINETYPE }}\" >> gcp.pkrvars.hcl
           echo diskType=\"${{ secrets.DISKTYPE }}\" >> gcp.pkrvars.hcl
           echo diskSize=${{ secrets.DISKSIZE }} >> gcp.pkrvars.hcl
-          echo DB_PASSWORD=\"${{ secrets.DB_PASSWORD }}\" >> gcp.pkrvars.hcl
-          echo DB_USER=\"${{ secrets.DB_USER }}\" >> gcp.pkrvars.hcl
-          echo DB_NAME=\"${{ secrets.DB_NAME}}\" >> gcp.pkrvars.hcl
           echo image_family_name=\"${{ secrets.IMAGE_FAMILY_NAME}}\" >> gcp.pkrvars.hcl
           echo image_name=\"${{ secrets.IMAGE_NAME}}\" >> gcp.pkrvars.hcl
 
