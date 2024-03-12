@@ -72,3 +72,4 @@ Ensure you have a `.pkrvars` file for Packer variables. For reference, check `ex
   ```
   
 Test Assignment 5
+k
