@@ -69,3 +69,4 @@ packer validate --var-file=gcp.pkrvars.hcl gcp.pkr.hcl
 packer build --var-file=gcp.pkrvars.hcl gcp.pkr.hcl   
 ```
 
+test 1
