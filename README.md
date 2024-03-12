@@ -71,3 +71,4 @@ Ensure you have a `.pkrvars` file for Packer variables. For reference, check `ex
   packer build --var-file=gcp.pkrvars.hcl gcp.pkr.hcl
   ```
   
+Test Assignment 5
