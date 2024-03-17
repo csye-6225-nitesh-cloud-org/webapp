@@ -1,5 +1,5 @@
 const winston = require('winston');
-const appRoot = require('app-root-path');
+const logFilePath = process.env.LOG_FILE_PATH || `/var/log/webapp.log`;
 const logger = winston.createLogger({
     format: winston.format.combine(
         winston.format.timestamp(),
@@ -14,7 +14,7 @@ const logger = winston.createLogger({
 
     ),
     transports:[
-        new winston.transports.File({filename:`${appRoot}/logs/webapp.log`})
+        new winston.transports.File({filename:logFilePath})
     ]
 });
 module.exports = logger;
