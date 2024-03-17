@@ -139,7 +139,8 @@ const editUserData = async (req, res) => {
         }
 
     }
-    if (req.body.username && req.body.username !== authUser.username) {
+    if (req.body.username && req.body.username !== authUser) {
+        console.log(authUser.username)
         logger.warn('Request Failed: Username cannot be updated');
         return res.status(400).json({
             message: "Username cannot be updated"
