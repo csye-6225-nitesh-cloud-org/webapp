@@ -1,5 +1,5 @@
 const winston = require('winston');
-const logFilePath = process.env.LOG_FILE_PATH || `/var/log/webapp.log`;
+const logFilePath = process.env.LOG_FILE_PATH || `/var/log/webapp/webapp.log`;
 const logger = winston.createLogger({
     format: winston.format.combine(
         winston.format.timestamp(),

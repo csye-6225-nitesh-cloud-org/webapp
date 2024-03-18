@@ -29,4 +29,7 @@ echo "Installing Node.js dependencies."
 cd /home/csye6225/webapp
 sudo npm install
 
+echo "Creating Folder for Logs"
+sudo mkdir /var/log/webapp
+sudo chown csye6225:csye6225 /var/log/webapp
 echo "Node.js application setup complete."

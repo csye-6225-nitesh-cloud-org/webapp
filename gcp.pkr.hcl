@@ -84,6 +84,7 @@ build {
       "scripts/create-user.sh",
       "scripts/setup.sh",
       "scripts/app-setup.sh",
+      "scripts/configure-OpsAgent.sh",
       "scripts/systemd.sh"
     ]
   }
