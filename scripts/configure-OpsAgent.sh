@@ -21,12 +21,14 @@ logging:
       type: modify_fields
       fields:
         severity:
-          move_from: jsonPayload.severity
+          copy_from: jsonPayload.severity
   service:
     pipelines:
       default_pipeline:
         receivers: [webapp-receiver]
         processors: [webapp-processor, adjust_severity]
+global:
+  default_self_log_file_collection: false
 EOF
 
 echo "Restarting Google Cloud Ops Agent..."
