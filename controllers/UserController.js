@@ -1,8 +1,15 @@
 const User = require("../models/user.model");
+const EmailLog = require("../models/EmailLog.model")
 const bcrypt = require('bcrypt');
 const logger = require("../config/logger")
+const uuid = require('uuid');
+const { PubSub } = require('@google-cloud/pubsub');
+const {Op} = require("sequelize");
+const config = require("../config/config");
+
 
 const createUser = async (req, res) => {
+
     const {method, protocol, hostname, originalUrl} = req;
     logger.info(`Requested:${method} ${protocol}://${hostname}${originalUrl}`);
     const {first_name, last_name, password, username, ...unwantedFields} = req.body;
@@ -60,14 +67,37 @@ const createUser = async (req, res) => {
                 message: "Username already exists"
             });
         }
+        const topic = config.PUB_SUB_TOPIC;
+        const pubsub = new PubSub({
+            projectId :config.GCP_PROJECT_ID
+        });
+        const verificationToken = uuid.v4();
+        const verificationTokenExpires = new Date(Date.now() + 120000);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = await User.create({
             first_name,
             last_name,
             username,
-            password: hashedPassword
+            password: hashedPassword,
+            verification_token: verificationToken,
+            verification_token_expires: verificationTokenExpires,
         });
+        const messagePayload = {
+            firstName: newUser.first_name,
+            lastName: newUser.last_name,
+            username: newUser.username,
+            verificationToken: verificationToken,
+            verificationTokenExpires: verificationTokenExpires.toISOString(),
+        }
+        try {
+            const messageId = await pubsub.topic(topic).publishMessage({data: Buffer.from(JSON.stringify(messagePayload))});
+            logger.info(`Message ${messageId} published to topic ${topic}`);
+        }
+        catch (err)
+        {
+            logger.warn(`Failed to publish Message to topic ${topic}`);
+        }
         res.status(201).json({
             id: newUser.id,
             first_name: newUser.first_name,
@@ -76,7 +106,7 @@ const createUser = async (req, res) => {
             account_created: newUser.account_created,
             account_updated: newUser.account_updated
         });
-        logger.info(`User ${newUser.first_name} ${newUser.last_name} created`);
+        logger.info(`User created, username : ${newUser.username} `);
     } catch (err) {
         logger.error(`Error creating user: ${err}` );
         return res.status(500).json({
@@ -125,8 +155,8 @@ const editUserData = async (req, res) => {
     }
 
     if (password !== undefined) {
-        logger.warn('Request Failed: Password was empty ');
         if( typeof password !== 'string' || password.trim() === "") {
+            logger.warn('Request Failed: Password was empty ');
             return res.status(400).json({
                 message: "Password must be a non empty string."
             });
@@ -197,7 +227,7 @@ const getUser = async (req, res) => {
                 },
             attributes:
                 {
-                    exclude: ['password']
+                    exclude: ['password','verification_token','email_verified','verification_token_expires']
                 }
 
         });
@@ -216,9 +246,44 @@ const getUser = async (req, res) => {
         });
     }
 }
+const verifyEmail = async (req, res) => {
+    const token = req.query.token;
+    if(!token)
+    {
+        logger.error(`Token is missing from API :  ${req.originalUrl}`);
+        return res.status(400).send();
+    }
+    try {
+        const user = await User.findOne({
+            where: {
+                verification_token: token,
+                verification_token_expires: {
+                    [Op.gt]: new Date(),
+                },
+            }
+        });
+        if (!user) {
+            logger.warn('Verification Link Expired')
+            return res.status(400).send(`<h1>Verification link is invalid or has expired.</h1>`);
+        }
 
+        user.email_verified = true;
+        user.verification_token = null;
+        user.verification_token_expires = null;
+        await user.save();
+        logger.info(`Email Verified for Username: ${user.username}`);
+        return res.status(200).send('<h1>Your email has been successfully verified.</h1>');
+    }
+    catch (err){
+        logger.error(`Email Verification Failed: ${err}`);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
 module.exports = {
     createUser,
     editUserData,
-    getUser
+    getUser,
+    verifyEmail
 }

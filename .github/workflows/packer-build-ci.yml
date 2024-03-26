@@ -46,6 +46,8 @@ jobs:
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
           echo PORT=${{ secrets.PORT }} >> .env
           echo HOSTNAME=${{ secrets.HOSTNAME }} >> .env
+          echo PUB_SUB_TOPIC=${{ secrets.PUB_SUB_TOPIC }} >> .env
+          echo GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} >> .env
 
       - name: Run Test
         run: |

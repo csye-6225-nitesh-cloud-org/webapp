@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const  {createUser, editUserData, getUser } =  require('../controllers/UserController');
+const  {createUser, editUserData, getUser,verifyEmail } =  require('../controllers/UserController');
 const  authMiddleware = require('../middlewares/auth');
 const headers = {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -11,6 +11,7 @@ router.head('/user', (req,res) => {res.status(405).header(headers).send();});
 router.head('/user/self', (req,res) => {res.status(405).header(headers).send();});
 router.post('/user',createUser);
 router.get('/user/self',authMiddleware, getUser);
+router.get('/user/verify-email',verifyEmail)
 router.put('/user/self',authMiddleware,editUserData);
 router.options('/user', (req,res) => {res.status(405).header(headers).send();});
 router.all('/user', (req,res) => {res.status(405).header(headers).send();});
