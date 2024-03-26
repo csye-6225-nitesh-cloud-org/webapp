@@ -4,7 +4,8 @@ const User = db.sequelize.define('User', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
+        primaryKey: true,
+        unique: true
     },
     first_name: {
         type: DataTypes.STRING,
@@ -48,6 +49,20 @@ const User = db.sequelize.define('User', {
                 msg:" Email address should not be Empty "
             }
         }
+    },
+    email_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
+    verification_token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
+    verification_token_expires: {
+        type: DataTypes.DATE,
+        allowNull: true,
     },
     account_created: {
         type: DataTypes.DATE,

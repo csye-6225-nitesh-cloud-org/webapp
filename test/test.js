@@ -13,6 +13,7 @@ describe('Integration Test', () => {
         password: "nitesh123",
         username: `nitesh_${suffix}@email.com`
     };
+
     const encodeValue = Buffer.from(`${userData.username}:${userData.password}`).toString('base64');
     const authHeader = `Basic ${encodeValue}`;
    
@@ -28,12 +29,16 @@ describe('Integration Test', () => {
             .send(userData);
         expect(res.statusCode).toBe(201);
 
+        await User.update( {email_verified: true}, {
+            where : {username: userData.username}
+        });
 
         const validate = await request(app)
             .get("/v1/user/self")
             .set("Authorization", authHeader)
         expect(validate.statusCode).toBe(200);
         expect(validate.body.username).toBe(userData.username);
+
     });
     it('TEST 2 - Update user and validate using GET call ', async () => {
         const newUserData = {

@@ -25,6 +25,13 @@ const authMiddleware = async (req, res, next) =>{
                 message: "Invalid Username or Password"
             });
         }
+        if(!user.email_verified)
+        {
+            logger.warn(`Email not verified for username : ${user.username}`)
+            return res.status(401).json({
+                message: "Email not verified "
+            });
+        }
         logger.info(`User authenticated successfully: ${username}`);
         req.authUser = {
             userId: user.id,
