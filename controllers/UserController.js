@@ -2,7 +2,6 @@ const User = require("../models/user.model");
 const EmailLog = require("../models/EmailLog.model")
 const bcrypt = require('bcrypt');
 const logger = require("../config/logger")
-const uuid = require('uuid');
 const { PubSub } = require('@google-cloud/pubsub');
 const {Op} = require("sequelize");
 const config = require("../config/config");
@@ -71,8 +70,6 @@ const createUser = async (req, res) => {
         const pubsub = new PubSub({
             projectId :config.GCP_PROJECT_ID
         });
-        const verificationToken = uuid.v4();
-        const verificationTokenExpires = new Date(Date.now() + 120000);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = await User.create({
@@ -80,15 +77,11 @@ const createUser = async (req, res) => {
             last_name,
             username,
             password: hashedPassword,
-            verification_token: verificationToken,
-            verification_token_expires: verificationTokenExpires,
         });
         const messagePayload = {
             firstName: newUser.first_name,
             lastName: newUser.last_name,
             username: newUser.username,
-            verificationToken: verificationToken,
-            verificationTokenExpires: verificationTokenExpires.toISOString(),
         }
         try {
             const messageId = await pubsub.topic(topic).publishMessage({data: Buffer.from(JSON.stringify(messagePayload))});
@@ -256,21 +249,23 @@ const verifyEmail = async (req, res) => {
     try {
         const user = await User.findOne({
             where: {
-                verification_token: token,
-                verification_token_expires: {
-                    [Op.gt]: new Date(),
-                },
+                verification_token: token
             }
         });
         if (!user) {
-            logger.warn('Verification Link Expired')
-            return res.status(400).send(`<h1>Verification link is invalid or has expired.</h1>`);
+            logger.warn('User not found or token does not match')
+            return res.status(400).send(`<h1>Verification link is invalid.</h1>`);
         }
-
+        if(new Date() > user.verification_token_expires)
+        {
+            logger.warn('Verification Link Expired');
+            return res.status(400).send('<h1>Verification link has expired.</h1>');
+        }
         user.email_verified = true;
         user.verification_token = null;
         user.verification_token_expires = null;
         await user.save();
+
         logger.info(`Email Verified for Username: ${user.username}`);
         return res.status(200).send('<h1>Your email has been successfully verified.</h1>');
     }
