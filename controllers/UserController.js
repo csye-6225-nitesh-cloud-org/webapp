@@ -85,7 +85,7 @@ const createUser = async (req, res) => {
         }
         try {
             const messageId = await pubsub.topic(topic).publishMessage({data: Buffer.from(JSON.stringify(messagePayload))});
-            logger.info(`Message ${messageId} published to topic ${topic}`);
+            logger.info(`MessageId ${messageId} published to topic ${topic}`);
         }
         catch (err)
         {
@@ -254,12 +254,12 @@ const verifyEmail = async (req, res) => {
         });
         if (!user) {
             logger.warn('User not found or token does not match')
-            return res.status(400).send(`<h1>Verification link is invalid.</h1>`);
+            return res.status(400).json({message:"Verification link is invalid."}).send();
         }
         if(new Date() > user.verification_token_expires)
         {
             logger.warn('Verification Link Expired');
-            return res.status(400).send('<h1>Verification link has expired.</h1>');
+            return res.status(400).json({message:"Verification link has expired."}).send();
         }
         user.email_verified = true;
         user.verification_token = null;
@@ -267,7 +267,7 @@ const verifyEmail = async (req, res) => {
         await user.save();
 
         logger.info(`Email Verified for Username: ${user.username}`);
-        return res.status(200).send('<h1>Your email has been successfully verified.</h1>');
+        return res.status(200).json({message:"Your email has been successfully verified"}).send();
     }
     catch (err){
         logger.error(`Email Verification Failed: ${err}`);
