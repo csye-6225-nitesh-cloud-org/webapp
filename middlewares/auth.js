@@ -28,7 +28,7 @@ const authMiddleware = async (req, res, next) =>{
         if(!user.email_verified)
         {
             logger.warn(`Email not verified for username : ${user.username}`)
-            return res.status(401).json({
+            return res.status(403).json({
                 message: "Email not verified "
             });
         }
