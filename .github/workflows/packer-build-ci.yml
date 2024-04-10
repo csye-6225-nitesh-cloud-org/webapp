@@ -94,3 +94,70 @@ jobs:
       - name: Packer build
         id: build
         run: "packer build  --var-file=gcp.pkrvars.hcl ./gcp.pkr.hcl"
+
+      - name: Extract Image Name
+        id: extract_image
+        run: |
+          IMAGE_NAME=$(jq -r '.builds[0].artifact_id' packer-manifest.json)
+          echo "Extracted Image Name: $IMAGE_NAME"
+          echo "::set-output name=image_name::$IMAGE_NAME"
+
+      - name: Create Instance Template
+        run: |
+          gcloud compute instance-templates create webapp-instance-template-${{ github.run_number }} \
+            --instance-template-region=${{ vars.GCP_REGION }} \
+            --machine-type=${{ vars.MACHINE_TYPE }} \
+            --network-tier=${{ vars.NW_TIER }} \
+            --subnet=${{ secrets.GCP_SUBNET }} \
+            --region=${{ vars.GCP_REGION }} \
+            --metadata=startup-script='#!/bin/bash
+          cat > ${{ vars.APP_PATH }} << End
+          NODE_ENV=${{ secrets.NODE_ENV }}
+          DB_HOST=${{ secrets.GCP_DB_HOST }}
+          DB_USER=${{ secrets.GCP_DB_USER }}
+          DB_PASSWORD=${{ secrets.GCP_DB_PASS }}
+          DB_NAME=${{ secrets.GCP_DB_NAME }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          PORT=${{ secrets.PORT }}
+          HOSTNAME=${{ secrets.HOSTNAME }}
+          PUB_SUB_TOPIC=${{ secrets.PUB_SUB_TOPIC }}
+          GCP_PROJECT_ID=${{ secrets.PROJECT_NAME }}
+          End' \
+            --maintenance-policy=MIGRATE \
+            --provisioning-model=STANDARD \
+            --service-account=${{ vars.SERVICE_ACCOUNT }} \
+            --scopes=${{ vars.GCP_SCOPES }} \
+            --tags=${{ vars.GCP_TAGS }} \
+            --create-disk="auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/${{ secrets.PROJECT_NAME }}/global/images/${{ steps.extract_image.outputs.image_name }},kms-key=projects/${{ secrets.PROJECT_NAME }}/locations/${{ vars.GCP_REGION }}/keyRings/${{ secrets.KEYRING }}/cryptoKeys/${{ secrets.VM_KEY }},mode=rw,size=20,type=pd-standard" \
+            --no-shielded-secure-boot \
+            --shielded-vtpm \
+            --shielded-integrity-monitoring \
+            --reservation-affinity=any
+
+
+      - name: Set Instance Template
+        id: set_instance_template
+        run: |
+          gcloud compute instance-groups managed set-instance-template ${{ vars.MIG_NAME }} \
+          	--template=projects/${{ secrets.PROJECT_NAME }}/regions/${{ vars.GCP_REGION }}/instanceTemplates/webapp-instance-template-${{ github.run_number }} \
+          	--region=us-central1
+
+      - name: Start Rolling Update
+        id: update_mig
+        run: |
+          gcloud compute instance-groups managed rolling-action start-update ${{ vars.MIG_NAME }} \
+            --version=template=projects/${{ secrets.PROJECT_NAME }}/regions/${{ vars.GCP_REGION }}/instanceTemplates/webapp-instance-template-${{ github.run_number }} \
+            --region=${{ vars.GCP_REGION }}
+
+      - name: Wait for MIG to roll updates
+        id: wait_for_update
+        run: |
+          gcloud compute instance-groups managed wait-until webapp-igm \
+            --version-target-reached \
+            --region us-central1; then
+                echo "Version target reached successfully."
+                exit 0
+              else
+                echo "Failed to reach the version target."
+                exit 1
+              fi
