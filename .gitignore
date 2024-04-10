@@ -84,7 +84,7 @@ dist
 *.zip
 *.tar.gz
 *.tar
-manifest*
+packer-manifest*
 
 # Other directories and files to ignore
 .node_repl_history
