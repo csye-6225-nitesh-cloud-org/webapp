@@ -154,10 +154,4 @@ jobs:
         run: |
           gcloud compute instance-groups managed wait-until webapp-igm \
             --version-target-reached \
-            --region us-central1; then
-                echo "Version target reached successfully."
-                exit 0
-              else
-                echo "Failed to reach the version target."
-                exit 1
-              fi
+            --region ${{ vars.GCP_REGION }}
