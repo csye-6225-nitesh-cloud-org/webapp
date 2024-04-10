@@ -149,7 +149,7 @@ jobs:
             --version=template=projects/${{ secrets.PROJECT_NAME }}/regions/${{ vars.GCP_REGION }}/instanceTemplates/webapp-instance-template-${{ github.run_number }} \
             --region=${{ vars.GCP_REGION }} \
             --max-surge=3 \
-            --max-unavailable=0 \
+            --max-unavailable=0
 
       - name: Wait for MIG to roll updates
         id: wait_for_update
