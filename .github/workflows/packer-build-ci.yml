@@ -142,6 +142,7 @@ jobs:
           	--template=projects/${{ secrets.PROJECT_NAME }}/regions/${{ vars.GCP_REGION }}/instanceTemplates/webapp-instance-template-${{ github.run_number }} \
           	--region=${{ vars.GCP_REGION }}
 
+
       - name: Start Rolling Update
         id: update_mig
         run: |
