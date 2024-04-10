@@ -99,8 +99,8 @@ jobs:
         id: extract_image
         run: |
           IMAGE_NAME=$(jq -r '.builds[0].artifact_id' packer-manifest.json)
-          echo "Extracted Image Name: $IMAGE_NAME"
-          echo "::set-output name=image_name::$IMAGE_NAME"
+          echo "Extracted Image Name"
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Create Instance Template
         run: |
@@ -128,7 +128,7 @@ jobs:
             --service-account=${{ vars.SERVICE_ACCOUNT }} \
             --scopes=${{ vars.GCP_SCOPES }} \
             --tags=${{ vars.GCP_TAGS }} \
-            --create-disk="auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/${{ secrets.PROJECT_NAME }}/global/images/${{ steps.extract_image.outputs.image_name }},kms-key=projects/${{ secrets.PROJECT_NAME }}/locations/${{ vars.GCP_REGION }}/keyRings/${{ secrets.KEYRING }}/cryptoKeys/${{ secrets.VM_KEY }},mode=rw,size=20,type=pd-standard" \
+            --create-disk="auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/${{ secrets.PROJECT_NAME }}/global/images/$image_name,kms-key=projects/${{ secrets.PROJECT_NAME }}/locations/${{ vars.GCP_REGION }}/keyRings/${{ secrets.KEYRING }}/cryptoKeys/${{ secrets.VM_KEY }},mode=rw,size=20,type=pd-standard" \
             --no-shielded-secure-boot \
             --shielded-vtpm \
             --shielded-integrity-monitoring \
