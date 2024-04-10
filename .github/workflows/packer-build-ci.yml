@@ -140,7 +140,7 @@ jobs:
         run: |
           gcloud compute instance-groups managed set-instance-template ${{ vars.MIG_NAME }} \
           	--template=projects/${{ secrets.PROJECT_NAME }}/regions/${{ vars.GCP_REGION }}/instanceTemplates/webapp-instance-template-${{ github.run_number }} \
-          	--region=us-central1
+          	--region=${{ vars.GCP_REGION }}
 
       - name: Start Rolling Update
         id: update_mig
