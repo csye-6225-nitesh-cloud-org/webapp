@@ -7,7 +7,7 @@ const PORT = config.PORT;
 const HOSTNAME = config.HOSTNAME;
 app.use(express.json());
 app.use("/", routes.health);
-app.use("/v1", routes.user);
+app.use("/v2", routes.user);
 
 app.use('*',(req,res)=>{
 res.status(404).send();
