@@ -25,7 +25,7 @@ describe('Integration Test', () => {
 
     it('TEST 1 - Create user and validate using GET call ', async () => {
         const res = await request(app)
-            .post("/v1/user")
+            .post("/v2/user")
             .send(userData);
         expect(res.statusCode).toBe(201);
 
@@ -34,7 +34,7 @@ describe('Integration Test', () => {
         });
 
         const validate = await request(app)
-            .get("/v1/user/self")
+            .get("/v2/user/self")
             .set("Authorization", authHeader)
         expect(validate.statusCode).toBe(200);
         expect(validate.body.username).toBe(userData.username);
@@ -51,14 +51,14 @@ describe('Integration Test', () => {
         const newAuthHeader = `Basic ${updatedPassword}`;
 
         const updateUser = await request(app)
-            .put("/v1/user/self")
+            .put("/v2/user/self")
             .set("Authorization", authHeader)
             .send(newUserData);
         expect(updateUser.statusCode).toBe(204);
 
 
         const validateChanges = await request(app)
-            .get("/v1/user/self")
+            .get("/v2/user/self")
             .set("Authorization", newAuthHeader)
         expect(validateChanges.statusCode).toBe(200);
         expect(validateChanges.body.first_name).toBe(newUserData.first_name);
