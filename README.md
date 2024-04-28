@@ -70,6 +70,8 @@ Ensure you have a `.pkrvars` file for Packer variables. For reference, check `ex
   ```shell
   packer build --var-file=gcp.pkrvars.hcl gcp.pkr.hcl
   ```
-  
-Test Assignment 5
-k
+  ### CI/CD with Custom Image Creation and Rolling Updates 🛠️🔄
+
+The "webapp" repository boasts robust CI/CD pipelines orchestrated through GitHub Actions. These pipelines aren't just about deploying code; they're about ensuring top-notch quality and reliability through rigorous integration tests. But that's not all! We've turbocharged our deployment process by integrating Packer, guaranteeing rock-solid and reproducible deployments.
+
+But wait, there's more! 🚀 Our CI/CD process doesn't stop there. It's smart enough to churn out fresh images for every new version of our application automatically. And guess what? It doesn't break a sweat when it comes to rolling out updates. Seamless and efficient, it spins up new instance templates for our Managed Instance Group (MIG), intricately meshing them with a load balancer to ensure traffic flows smoothly. 🌐
